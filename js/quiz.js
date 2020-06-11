@@ -78,6 +78,7 @@ $(document).ready(function () {
     // array of question objects
     var questionsList = [question0,question1,question2,question3,question4,question5,question6,question7,question8,question9];
 
+    var questionNumber = 0
     var correctCounter = 0
     var incorrectCounter = 0
     var quizCounter = 0
@@ -100,27 +101,12 @@ $(document).ready(function () {
         $("#startButton").remove("#startButton");
         // empty the question list
         questionContainer.empty()
-        // Start the quiz
-        LoadQuestion(0)
-
     });
-
     
-            
-
-
-
     
+
         function LoadQuestion(questionNumber) {
             var thisQuestion = questionNumber
-            
-            if (thisQuestion == 10) {
-                // display results!
-                
-            } else{
-                // do nothing, all is well and 
-
-            }
             // first clear all question
             alertText.empty()
             questionText.empty()
@@ -137,7 +123,7 @@ $(document).ready(function () {
                 // display the question
                 questionText.text(crntQuestion.theQuestion[0])
                 // create a new list item
-                var choice = $("<li><button></button></li>");
+                var choice = $("<li>");
                 // create the button
                 choice.attr("type", "button");
                 choice.text(crntQuestion.theChoices[i])
@@ -145,35 +131,7 @@ $(document).ready(function () {
                 choice.attr("id", "btn"+i)
                 questionContainer.append(choice);
             }
-            // What happens when a choice is selected
-            questionContainer.on("click", function (event) {
-                event.preventDefault();
-                var element = event.target;
-                if (element.matches("li") === true) {
-                        // get the text of the button
-                        var buttonSelected = $(element).text();
-                        if ((buttonSelected === crntQuestion.theAwnser[0]) === false) {
-                            // when user picks the wrong choice
-                            // play the wrong choice sound
-                            playSound(incorrectSound)
-                            // shake the screen for 2 seconds
-                            shakeScreen(4)
-                            // add to incorrect counter
-                            incorrectCounter++
-                            questionNumber++
-                            
-                        }else {
-                            // when user picks the right choice
-                            // play incorrect sound
-                            playSound(correctSound)
-                            // shake the screen for .5 seconds
-                            shakeScreen(1)
-                            correctCounter++
-                            questionNumber++
-                        }                
-                }
-                LoadQuestion(questionNumber)
-            });
+           
 
 
 
@@ -185,7 +143,73 @@ $(document).ready(function () {
 
 
 
+ // What happens when a choice is selected
+ questionContainer.on("click", function (event) {
+    event.preventDefault();
+    var element = event.target;
+    if (element.matches("li") === true) {
+            // get the text of the button
+            var buttonSelected = $(element).text();
+            if ((buttonSelected === crntQuestion.theAwnser[0]) === false) {
+                // when user picks the wrong choice
+                // play the wrong choice sound
+                playSound(incorrectSound)
+                // add to incorrect counter
+                incorrectCounter++
+                thisQuestion++
+                
+                // shake the screen for 2 seconds
+                shakeScreen(4)
 
+                
+            }else{
+                // when user picks the right choice
+                // play incorrect sound
+                playSound(correctSound)
+                correctCounter++
+                thisQuestion++
+                // shake the screen for .5 seconds
+                shakeScreen(1)
+
+            }                
+    }
+
+
+
+    if (thisQuestion == 10) {              
+        // quiz complete
+        // clear the contents of the screen
+        bigText.empty()
+        alertText.empty()
+        questionText.empty()
+        questionContainer.empty()
+        // create a new para
+        totalCorrect = $("<div>")
+        totalCorrect.attr("class", "alert alert-secondary")
+        totalCorrect.attr("class", "alert")
+        totalCorrect.text("Correct Answers: " + correctCounter)
+        $("#resultsContainer").append(totalCorrect);
+
+
+
+        quizCounter++
+        bigText.text("Your Score")
+        alertText.text("Let's see how you did.")
+        
+        questionText.html("This some text")
+        questionText.html("sadasdfasdfasdf")
+        // play ending sound
+
+        // display results!
+        
+        
+    } else {
+        // do nothing, all is well and show the next question
+        LoadQuestion(thisQuestion)
+        // LoadQuestion(questionNumber)
+    }
+    
+});
 
 
 
