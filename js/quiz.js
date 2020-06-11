@@ -78,7 +78,6 @@ $(document).ready(function () {
     // array of question objects
     var questionsList = [question0,question1,question2,question3,question4,question5,question6,question7,question8,question9];
 
-    var questionNumber = 0
     var correctCounter = 0
     var incorrectCounter = 0
     var quizCounter = 0
@@ -101,12 +100,14 @@ $(document).ready(function () {
         $("#startButton").remove("#startButton");
         // empty the question list
         questionContainer.empty()
-    });
-    
-    
+        // Start the quiz
+        loadQuestion(0)
 
-        function LoadQuestion(questionNumber) {
+    });
+
+        function loadQuestion(questionNumber) {
             var thisQuestion = questionNumber
+            
             // first clear all question
             alertText.empty()
             questionText.empty()
@@ -131,7 +132,39 @@ $(document).ready(function () {
                 choice.attr("id", "btn"+i)
                 questionContainer.append(choice);
             }
-           
+            // What happens when a choice is selected
+            questionContainer.on("click", function (event) {
+                event.preventDefault();
+                var element = event.target;
+                if (element.matches("li") === true) {
+                    // get the text of the button
+                    var buttonSelected = $(element).text();
+                    if ((buttonSelected === crntQuestion.theAwnser[0]) === false) {
+                        // when user picks the wrong choice
+                        // play the wrong choice sound
+                        playSound(incorrectSound)
+                        // add to incorrect counter
+
+                        console.log(incorrectCounter + " incorrect so far")
+                        // shake the screen for 2 seconds
+                        // shakeScreen(4)
+                        correctCounter++
+                        
+                        nextQuestion()
+
+                    }else{
+                        // when user picks the right choice
+                        // play incorrect sound
+                        playSound(correctSound)
+                        incorrectCounter++
+                        console.log(correctCounter + " correct so far")
+                        // shake the screen for .5 seconds
+                        // shakeScreen(1)
+                        nextQuestion()
+                    }                
+                }
+
+            });
 
 
 
@@ -143,85 +176,32 @@ $(document).ready(function () {
 
 
 
- // What happens when a choice is selected
- questionContainer.on("click", function (event) {
-    event.preventDefault();
-    var element = event.target;
-    if (element.matches("li") === true) {
-            // get the text of the button
-            var buttonSelected = $(element).text();
-            if ((buttonSelected === crntQuestion.theAwnser[0]) === false) {
-                // when user picks the wrong choice
-                // play the wrong choice sound
-                playSound(incorrectSound)
-                // add to incorrect counter
-                incorrectCounter++
-                thisQuestion++
-                
-                // shake the screen for 2 seconds
-                shakeScreen(4)
 
-                
-            }else{
-                // when user picks the right choice
-                // play incorrect sound
-                playSound(correctSound)
-                correctCounter++
-                thisQuestion++
-                // shake the screen for .5 seconds
-                shakeScreen(1)
 
-            }                
+
+
+
+
+
+
+
+
+
+
+    // Functions
+    function nextQuestion(params) {
+    // display the next button to 
+    // create the button
+    nextDiv = $("#nextDiv")
+    var nextButton = $("<button></button>")
+    nextButton.attr("class", "alert alert-dark");
+    nextButton.text("Next Question")
+    nextDiv.append(nextButton)
+    thisQuestion++
     }
 
 
 
-    if (thisQuestion == 10) {              
-        // quiz complete
-        // clear the contents of the screen
-        bigText.empty()
-        alertText.empty()
-        questionText.empty()
-        questionContainer.empty()
-        // create a new para
-        totalCorrect = $("<div>")
-        totalCorrect.attr("class", "alert alert-secondary")
-        totalCorrect.attr("class", "alert")
-        totalCorrect.text("Correct Answers: " + correctCounter)
-        $("#resultsContainer").append(totalCorrect);
-
-
-
-        quizCounter++
-        bigText.text("Your Score")
-        alertText.text("Let's see how you did.")
-        
-        questionText.html("This some text")
-        questionText.html("sadasdfasdfasdf")
-        // play ending sound
-
-        // display results!
-        
-        
-    } else {
-        // do nothing, all is well and show the next question
-        LoadQuestion(thisQuestion)
-        // LoadQuestion(questionNumber)
-    }
-    
-});
-
-
-
-
-
-
-
-
-
-
-
-// Functions
     // play a sound(what sound?)
     function playSound(SoundType) {
     var audiobox = $("#soundBox")
@@ -237,6 +217,31 @@ $(document).ready(function () {
         $("body").css("animation-iteration-count", count);
     }
 
+    function produceResults() {
+        // produce the results
+        // clear the contents of the screen
+        bigText.empty()
+        alertText.empty()
+        questionText.empty()
+        questionContainer.empty()
+        // create a new para
+        totalCorrect = $("<div>")
+        totalCorrect.attr("class", "alert alert-primary")
+        totalCorrect.text("Correct Answers: " + correctCounter)
+        $("#resultsContainer").append(totalCorrect);
+
+
+
+        quizCounter++
+        bigText.text("Your Score")
+        alertText.text("Let's see how you did.")
+        
+        questionText.html("This some text")
+        // play ending sound
+
+        // display results!
+                    
+    }
 
 
 });
