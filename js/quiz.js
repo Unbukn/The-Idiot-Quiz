@@ -7,14 +7,16 @@ $(document).ready(function () {
     var alertText = $("#displayAlerts")
     var questionText = $("#displayQuestion")
     var questionContainer = $("#choiceList")
-
+    var resultsContainer = $("#resultsContainer")
+    var nextDiv = $("#nextDiv")
+    
     // sounds object
     var sound = {
         start: ["./assets/Start.wav"],
         correct: ["./assets/success.wav"],
         incorrect: ["./assets/incorrect.wav"],
         timesUp: [""],
-        end: [""],
+        end: ["./assets/end.wav"],
     }; 
 
     var startSound = sound.start[0];
@@ -80,17 +82,20 @@ $(document).ready(function () {
 
     var correctCounter = 0
     var incorrectCounter = 0
+    var questionCounter = 0
     var quizCounter = 0
     var endTest = false
 
 
-    // display page title
+    // Initial Display belwo
     pageTitle.text("The Idiot Quiz - Start"); 
     // display the application title
     bigText.text("The Idiot Quiz")
     // display random startup text
     alertText.text(startingText[Math.floor(Math.random() * startingText.length)]);
 
+
+    //  event listeners below
     // wait for start to be clicked
     $("#startButton").click(function (event) { 
         event.preventDefault();
@@ -100,75 +105,68 @@ $(document).ready(function () {
         $("#startButton").remove("#startButton");
         // empty the question list
         questionContainer.empty()
-        // Start the quiz
-        loadQuestion(0)
-
+        // Start the quiz (question Number)
+        loadQuestion(questionCounter)
     });
 
-        function loadQuestion(questionNumber) {
-            var thisQuestion = questionNumber
-            
-            // first clear all question
-            alertText.empty()
-            questionText.empty()
-            questionContainer.empty()
-            
-            // produce questions
-            
-            var crntQuestion = questionsList[thisQuestion];
-            questionText.text(crntQuestion.theQuestion[0]);
-            questionText.attr("class", "lead");
+    // when a choice is selected
+    questionContainer.on("click", function (event) {
+        event.preventDefault();
+        var element = event.target;
+        if (element.matches("li") === true) {
+            // get the text of the button
+            var buttonSelected = $(element).text();
+            // when user picks the wrong choice
+            if ((buttonSelected === questionsList[questionCounter].theAwnser[0]) === false) {
+                // play the wrong choice sound
+                playSound(incorrectSound)
+                // add to incorrect counter
+                incorrectCounter++
+                console.log(incorrectCounter + " incorrect so far")
+                // shake the screen for 2 seconds
+                // shakeScreen(4)
+                showNextButton()
 
-            // produce choices
-            for (i = 0; i < crntQuestion.theChoices.length; i++) {
-                // display the question
-                questionText.text(crntQuestion.theQuestion[0])
-                // create a new list item
-                var choice = $("<li>");
-                // create the button
-                choice.attr("type", "button");
-                choice.text(crntQuestion.theChoices[i])
-                choice.addClass("btn btn-outline-primary");
-                choice.attr("id", "btn"+i)
-                questionContainer.append(choice);
-            }
-            // What happens when a choice is selected
-            questionContainer.on("click", function (event) {
-                event.preventDefault();
-                var element = event.target;
-                if (element.matches("li") === true) {
-                    // get the text of the button
-                    var buttonSelected = $(element).text();
-                    if ((buttonSelected === crntQuestion.theAwnser[0]) === false) {
-                        // when user picks the wrong choice
-                        // play the wrong choice sound
-                        playSound(incorrectSound)
-                        // add to incorrect counter
-
-                        console.log(incorrectCounter + " incorrect so far")
-                        // shake the screen for 2 seconds
-                        // shakeScreen(4)
-                        correctCounter++
-                        
-                        nextQuestion()
-
-                    }else{
-                        // when user picks the right choice
-                        // play incorrect sound
-                        playSound(correctSound)
-                        incorrectCounter++
-                        console.log(correctCounter + " correct so far")
-                        // shake the screen for .5 seconds
-                        // shakeScreen(1)
-                        nextQuestion()
-                    }                
-                }
-
-            });
-
-
-
+            }else{
+                // when user picks the right choice
+                // play incorrect sound
+                playSound(correctSound)
+                correctCounter++
+                console.log(correctCounter + " correct so far")
+                // shake the screen for .5 seconds
+                // shakeScreen(1)
+                showNextButton()
+            }                
         }
+
+    });
+    
+    // when the next button is clicked
+    nextDiv.click(function (e) { 
+        e.preventDefault();
+        // if it's a button
+        var element = event.target;
+        if (element.matches("button") === true) {
+            // load the next question
+            nextQuestion()
+            // clear the next button
+            element.remove()
+        }
+        
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -189,15 +187,58 @@ $(document).ready(function () {
 
 
     // Functions
-    function nextQuestion(params) {
-    // display the next button to 
-    // create the button
-    nextDiv = $("#nextDiv")
-    var nextButton = $("<button></button>")
-    nextButton.attr("class", "alert alert-dark");
-    nextButton.text("Next Question")
-    nextDiv.append(nextButton)
-    thisQuestion++
+    function loadQuestion(questionNumber) {
+        if (questionCounter == 10) {
+            produceResults()
+        }else {
+            var thisQuestion = questionNumber
+            // first clear all question
+            alertText.empty()
+            questionText.empty()
+            questionContainer.empty()
+            // produce questions
+            var crntQuestion = questionsList[thisQuestion];
+            questionText.text(crntQuestion.theQuestion[0]);
+            questionText.attr("class", "lead");
+
+            // produce choices
+            for (i = 0; i < crntQuestion.theChoices.length; i++) {
+                // display the question
+                questionText.text(crntQuestion.theQuestion[0])
+                // create a new list item
+                var choice = $("<li>");
+                // create the button
+                choice.attr("type", "button");
+                choice.text(crntQuestion.theChoices[i])
+                choice.addClass("btn btn-outline-primary");
+                choice.attr("id", "btn"+i)
+                questionContainer.append(choice);
+            }    
+        }
+    }
+
+    function showNextButton() {
+        questionCounter++
+        // display the next button to 
+        // create the button
+        var nextButton = $("<button></button>")
+        // style the button
+        nextButton.attr("class", "alert alert-dark");
+        if (questionCounter == 10) {
+            buttonText = "Get your score"
+        }else{
+            buttonText = "Next Question"
+        }
+        // add text to the button
+        nextButton.text(buttonText)
+        nextDiv.append(nextButton)
+        
+    }
+
+    function nextQuestion() {
+            
+            console.log("loading next quetion")
+            loadQuestion(questionCounter)
     }
 
 
@@ -218,29 +259,32 @@ $(document).ready(function () {
     }
 
     function produceResults() {
-        // produce the results
-        // clear the contents of the screen
-        bigText.empty()
-        alertText.empty()
-        questionText.empty()
+        quizCounter++      
+        // clear current question out
         questionContainer.empty()
-        // create a new para
-        totalCorrect = $("<div>")
-        totalCorrect.attr("class", "alert alert-primary")
-        totalCorrect.text("Correct Answers: " + correctCounter)
-        $("#resultsContainer").append(totalCorrect);
-
-
-
-        quizCounter++
         bigText.text("Your Score")
         alertText.text("Let's see how you did.")
-        
-        questionText.html("This some text")
-        // play ending sound
 
+        // total correct
+        totalCorrect = $("h3")
+        totalCorrect.attr("class", "alert alert-primary")
+        totalCorrect.text("Correct Answers: " + correctCounter)
+        
+        // attach them to the question container
+        resultsContainer.append(totalCorrect);
+
+        // total incorrect
+        totalIncorrect = $("h4")
+        totalIncorrect.attr("class", "alert alert-danger")
+        totalIncorrect.html("Incorrect Answers: " + incorrectCounter)
+        // attach them to the question container
+        resultsContainer.append(totalIncorrect);
+
+
+        // play ending sound
+        playSound()
         // display results!
-                    
+              
     }
 
 
