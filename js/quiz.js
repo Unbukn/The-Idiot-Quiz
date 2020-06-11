@@ -15,13 +15,15 @@ $(document).ready(function () {
         start: ["./assets/Start.wav"],
         correct: ["./assets/success.wav"],
         incorrect: ["./assets/incorrect.wav"],
-        timesUp: [""],
+        timesUp: ["./assets/TimesUp.wav"],
         end: ["./assets/end.wav"],
     }; 
 
     var startSound = sound.start[0];
     var correctSound = sound.correct[0];
     var incorrectSound = sound.incorrect[0];
+    var timesup = sound.timesUp[0];
+    var end = sound.end[0];
 
     // question objects are here
     var question0 = {
@@ -80,11 +82,13 @@ $(document).ready(function () {
     // array of question objects
     var questionsList = [question0,question1,question2,question3,question4,question5,question6,question7,question8,question9];
 
+    // timer in second
+    var secondsLeft = 60;
     var correctCounter = 0
     var incorrectCounter = 0
     var questionCounter = 0
     var quizCounter = 0
-    var endTest = false
+    var testEnd = false
 
 
     // Initial Display belwo
@@ -92,10 +96,18 @@ $(document).ready(function () {
     // display the application title
     bigText.text("The Idiot Quiz")
     // display random startup text
-    alertText.text(startingText[Math.floor(Math.random() * startingText.length)]);
+    alertText.text(startingText[~~(Math.random() * startingText.length)]);
 
 
-    //  event listeners below
+
+
+
+
+
+    
+    //**********************************event listeners below*****************
+
+
     // wait for start to be clicked
     $("#startButton").click(function (event) { 
         event.preventDefault();
@@ -107,6 +119,9 @@ $(document).ready(function () {
         questionContainer.empty()
         // Start the quiz (question Number)
         loadQuestion(questionCounter)
+        // start the timer
+        theTimer()
+
     });
 
     // when a choice is selected
@@ -123,8 +138,8 @@ $(document).ready(function () {
                 // add to incorrect counter
                 incorrectCounter++
                 console.log(incorrectCounter + " incorrect so far")
-                // shake the screen for 2 seconds
-                // shakeScreen(4)
+                // shake the screen for 1 seconds
+                shakeScreen(2)
                 showNextButton()
 
             }else{
@@ -134,7 +149,7 @@ $(document).ready(function () {
                 correctCounter++
                 console.log(correctCounter + " correct so far")
                 // shake the screen for .5 seconds
-                // shakeScreen(1)
+                shakeScreen(1)
                 showNextButton()
             }                
         }
@@ -188,7 +203,7 @@ $(document).ready(function () {
 
     // Functions
     function loadQuestion(questionNumber) {
-        if (questionCounter == 10) {
+        if (questionCounter == questionsList.length) {
             produceResults()
         }else {
             var thisQuestion = questionNumber
@@ -241,6 +256,34 @@ $(document).ready(function () {
             loadQuestion(questionCounter)
     }
 
+        function theTimer() {
+        
+        var timerInterval = setInterval(function() {
+            
+            secondsLeft--;
+            bigText.text(secondsLeft + " Seconds Remaining");
+
+            if(secondsLeft === 0) {
+            clearInterval(timerInterval);
+            sendMessage();
+            }else if (testEnd == true) {
+                // stop the time interval
+                clearInterval(timerInterval);
+                bigText.text("Quiz Over")
+            }
+                
+            
+
+        }, 1000);
+    }
+        function sendMessage() {
+        bigText.text("TIMES UP!")
+        // produce the results
+        produceResults()
+        // play sound
+        playSound(timesup)
+      }
+
 
 
     // play a sound(what sound?)
@@ -259,11 +302,17 @@ $(document).ready(function () {
     }
 
     function produceResults() {
+        testEnd = true
         quizCounter++      
         // clear current question out
         questionContainer.empty()
-        bigText.text("Your Score")
-        alertText.text("Let's see how you did.")
+
+        // determine result
+        if (totalCorrect <= 3) {
+            // Imbecile
+            
+        }
+        
 
         // total correct
         totalCorrect = $("h3")
@@ -282,7 +331,7 @@ $(document).ready(function () {
 
 
         // play ending sound
-        playSound()
+        playSound(end)
         // display results!
               
     }
