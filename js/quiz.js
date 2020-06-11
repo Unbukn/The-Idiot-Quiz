@@ -67,7 +67,7 @@ $(document).ready(function () {
     var question7 = {
         theQuestion: ["Ōkunoshima is an island off of Japan that’s completely overrun with _____."],
         theAwnser: ["Rabbits"],
-        theChoices:["Deer","Rabbit","Rats", "Dogs", "Computers"],
+        theChoices:["Deer","Rabbits","Rats", "Dogs", "Computers"],
     };
     var question8 = {
         theQuestion: ["Alfred Hitchcock’s Psycho was the first film to show a ____ on screen."],
@@ -91,7 +91,7 @@ $(document).ready(function () {
     var testEnd = false
 
 
-    // Initial Display belwo
+    // Initial Display below
     pageTitle.text("The Idiot Quiz - Start"); 
     // display the application title
     bigText.text("The Idiot Quiz")
@@ -127,21 +127,28 @@ $(document).ready(function () {
     // when a choice is selected
     questionContainer.on("click", function (event) {
         event.preventDefault();
+
         var element = event.target;
-        if (element.matches("li") === true) {
+        if (element.matches(".btn") === true) {
             // get the text of the button
             var buttonSelected = $(element).text();
             // when user picks the wrong choice
-            if ((buttonSelected === questionsList[questionCounter].theAwnser[0]) === false) {
+            var crntQuestion = questionsList[questionCounter]
+            if ((buttonSelected !== (crntQuestion.theAwnser[0])) === true) {
                 // play the wrong choice sound
                 playSound(incorrectSound)
                 // add to incorrect counter
                 incorrectCounter++
                 console.log(incorrectCounter + " incorrect so far")
                 // shake the screen for 1 seconds
-                shakeScreen(2)
+                // shakeScreen(2)
                 showNextButton()
-
+                // turn the button red
+                
+                $("li").removeClass("btn-outline-primary");
+                $("li").addClass("btn-primary")
+                // buttonSelected.removeClass("btn btn-outline-primary");
+                // buttonSelected.addClass("btn btn-outline-danger");
             }else{
                 // when user picks the right choice
                 // play incorrect sound
@@ -149,10 +156,17 @@ $(document).ready(function () {
                 correctCounter++
                 console.log(correctCounter + " correct so far")
                 // shake the screen for .5 seconds
+                                // turn the button green
+                // buttonSelected.removeClass("btn btn-outline-success");
+                // buttonSelected.addClass("btn btn-outline-danger");
                 shakeScreen(1)
                 showNextButton()
-            }                
+
+                
+            }
+       
         }
+        questionCounter++  
 
     });
     
@@ -169,37 +183,6 @@ $(document).ready(function () {
         }
         
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // Functions
     function loadQuestion(questionNumber) {
@@ -224,17 +207,20 @@ $(document).ready(function () {
                 var choice = $("<li>");
                 // create the button
                 choice.attr("type", "button");
-                choice.text(crntQuestion.theChoices[i])
                 choice.addClass("btn btn-outline-primary");
                 choice.attr("id", "btn"+i)
+                choice.text(crntQuestion.theChoices[i])
                 questionContainer.append(choice);
             }    
         }
     }
 
     function showNextButton() {
-        questionCounter++
+        // clear out existing next buttons
+        nextDiv.empty()
+
         // display the next button to 
+
         // create the button
         var nextButton = $("<button></button>")
         // style the button
@@ -261,19 +247,17 @@ $(document).ready(function () {
         var timerInterval = setInterval(function() {
             
             secondsLeft--;
-            bigText.text(secondsLeft + " Seconds Remaining");
-
             if(secondsLeft === 0) {
             clearInterval(timerInterval);
             sendMessage();
             }else if (testEnd == true) {
                 // stop the time interval
                 clearInterval(timerInterval);
-                bigText.text("Quiz Over")
-            }
                 
+            }else {
+                bigText.text(secondsLeft + " Seconds Remaining");
+            }
             
-
         }, 1000);
     }
         function sendMessage() {
@@ -303,31 +287,48 @@ $(document).ready(function () {
 
     function produceResults() {
         testEnd = true
-        quizCounter++      
+        quizCounter++
+        bigText.text("")      
         // clear current question out
         questionContainer.empty()
-
-        // determine result
-        if (totalCorrect <= 3) {
-            // Imbecile
-            
-        }
         
+        // create an new para for the results to go inside of
+        result = $("h4")
 
-        // total correct
-        totalCorrect = $("h3")
-        totalCorrect.attr("class", "alert alert-primary")
-        totalCorrect.text("Correct Answers: " + correctCounter)
-        
-        // attach them to the question container
-        resultsContainer.append(totalCorrect);
+            // determine result
+            if (correctCounter <= 2) {
+                // style it
+                result.attr("class", "alert alert-danger")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're are a complete imbecile and might be affected with moderate intellectual disability!")
+                bigText.text("Imbecile")
 
-        // total incorrect
-        totalIncorrect = $("h4")
-        totalIncorrect.attr("class", "alert alert-danger")
-        totalIncorrect.html("Incorrect Answers: " + incorrectCounter)
-        // attach them to the question container
-        resultsContainer.append(totalIncorrect);
+            }else if (correctCounter <= 4){
+                // style it
+                result.attr("class", "alert alert-danger")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're an idiot that most would consider a person of low intelligence!")
+                bigText.text("Idiot")
+            }
+            else if (correctCounter <= 6){
+                // style it
+                result.attr("class", "alert alert-warning")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're a moron, otherwise know as a stupid person.")
+                bigText.text("Moron")
+             }
+            else if (correctCounter <= 8){
+                // style it
+                result.attr("class", "alert alert-secondary")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're not too bright - Someone who is very stupid or just ignorant, and can't comprehend the most basic things.")
+                bigText.text("Not Too Bright")
+             }else if (correctCounter <= 10){
+                // style it
+                result.attr("class", "alert alert-success")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect! But, it still looks like you're pretty dumb. Many things are challenging for you.")
+                bigText.text("Still Pretty Dumb")
+             }
+                
+        // attach the result to the results container
+        resultsContainer.append(result);
+
 
 
         // play ending sound

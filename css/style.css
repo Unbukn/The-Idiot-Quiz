@@ -1,7 +1,7 @@
 body{
 background-color: rgba(16, 22, 63);
 font-family: 'IBM Plex Sans', sans-serif;
-color: white;
+color: rgb(199, 196, 196);
 overflow: hidden;
 }
 #bigText{
@@ -22,7 +22,7 @@ overflow: hidden;
     background-color:rgba(16, 22, 63);
 }
 
-li:hover {
+.btn:hover {
     animation: shake 0.5s;
     animation-iteration-count: infinite;
 }
