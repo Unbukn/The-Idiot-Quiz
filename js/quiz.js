@@ -127,56 +127,74 @@ $(document).ready(function () {
     // when a choice is selected
     questionContainer.on("click", function (event) {
         event.preventDefault();
-
         var element = event.target;
-        if (element.matches(".btn") === true) {
-            // get the text of the button
-            var buttonSelected = $(element).text();
-            // when user picks the wrong choice
-            var crntQuestion = questionsList[questionCounter]
-            if ((buttonSelected !== (crntQuestion.theAwnser[0])) === true) {
-                // play the wrong choice sound
-                playSound(incorrectSound)
-                // add to incorrect counter
-                incorrectCounter++
-                console.log(incorrectCounter + " incorrect so far")
-                // shake the screen for 1 seconds
-                // shakeScreen(2)
-                showNextButton()
-                // turn the button red
-                
-                $("li").removeClass("btn-outline-primary");
-                $("li").addClass("btn-primary")
-                // buttonSelected.removeClass("btn btn-outline-primary");
-                // buttonSelected.addClass("btn btn-outline-danger");
-            }else{
-                // when user picks the right choice
-                // play incorrect sound
-                playSound(correctSound)
-                correctCounter++
-                console.log(correctCounter + " correct so far")
-                // shake the screen for .5 seconds
-                                // turn the button green
-                // buttonSelected.removeClass("btn btn-outline-success");
-                // buttonSelected.addClass("btn btn-outline-danger");
-                shakeScreen(1)
-                showNextButton()
 
+        // prevent selecting multiple choices selection
+        var totalAwnsers = incorrectCounter + correctCounter
+              console.log("selected: " + totalAwnsers +" question#: " + questionCounter)
+              console.log(questionCounter == totalAwnsers)
+        if (totalAwnsers == questionCounter){
+            if (element.matches("li") === true) {
+                // get the text of the button
+                var buttonSelected = $(element).text();
+                // when user picks the wrong choice
+    
+                var crntQuestion = questionsList[questionCounter]
+                console.log(crntQuestion.theAwnser[0])
+                if (buttonSelected !== crntQuestion.theAwnser[0]) {
+                    // play the wrong choice sound
+                    playSound(incorrectSound)
+                    // add to incorrect counter
+                    incorrectCounter++
+                    console.log(incorrectCounter + " incorrect so far")
+                    // shake the screen for 1 seconds
+                    // shakeScreen(2)
+                    showNextButton()
+                    
+                    // turn the button red
+                    
+                    $("li").removeClass("btn-outline-primary");
+                    $("li").addClass("btn-primary")
+                    // buttonSelected.removeClass("btn btn-outline-primary");
+                    // buttonSelected.addClass("btn btn-outline-danger");
+                    
+                }else{
+                    // when user picks the right choice
+                    // play incorrect sound
+                    playSound(correctSound)
+                    correctCounter++
+                    console.log(correctCounter + " correct so far")
+                    // shake the screen for .5 seconds
+                                    // turn the button green
+                    // buttonSelected.removeClass("btn btn-outline-success");
+                    // buttonSelected.addClass("btn btn-outline-danger");
+                    shakeScreen(1)
+                    
+                    showNextButton()
+    
+                }
                 
+            
             }
-       
+            
+        }else if (totalAwnsers !== questionCounter){
+            alertText.addClass("alert alert-warning");
+            alertText.text("you already selected a choice for this question")
         }
-        questionCounter++  
+            
 
+    
     });
     
     // when the next button is clicked
     nextDiv.click(function (e) { 
         e.preventDefault();
         // if it's a button
+        
         var element = event.target;
         if (element.matches("button") === true) {
             // load the next question
+            questionCounter++
             nextQuestion()
             // clear the next button
             element.remove()
