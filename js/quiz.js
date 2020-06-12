@@ -1,31 +1,42 @@
+// Wait for the doc to be loaded
 $(document).ready(function () {
-        // Global vars and objects
-    // startup text var
-    var startingText = ["A quiz to evaluate where you fall on the scale of idocracy.", "This quiz is intended to inform you that no matter how smart you think you are, you're prolly an idiot.", "See if you have what it takes prove you've got a brain on those sholders."];
+    // Global vars and objects
+    // text to show before quiz starts
+    var startingText = ["A quiz to evaluate where you fall on the scale of STUPID.", "This quiz is intended to inform you that no matter how smart you think you are, you're prolly an idiot.", "See if you have what it takes prove you've got a brain on those sholders."];
+
+    // used to change the name of the page incase people want to google questions
     var pageTitle = $("title")
-    var bigText = $("#bigText")
+    // the big text and placeholder for the timer
+    var bigText = $("#bigText");
+    // where alters appear when you're doing something wrong
     var alertText = $("#displayAlerts")
+    // where the questions appear
     var questionText = $("#displayQuestion")
+
+    // where the options for each question appear
     var questionContainer = $("#choiceList")
+    // the parent div used to show the results
     var resultsContainer = $("#resultsContainer")
+    // div that holds the next question  button
     var nextDiv = $("#nextDiv")
     
-    // sounds object
+    // Object for all the sounds
     var sound = {
         start: ["./assets/Start.wav"],
         correct: ["./assets/success.wav"],
-        incorrect: ["./assets/incorrect.wav"],
+        incorrect: ["./assets/incorrect.wav","./assets/moron.wav"],
         timesUp: ["./assets/TimesUp.wav"],
         end: ["./assets/end.wav"],
     }; 
 
+    // vars for all the sounds that can be played
     var startSound = sound.start[0];
     var correctSound = sound.correct[0];
-    var incorrectSound = sound.incorrect[0];
+    var incorrectSound = sound.incorrect[~~(Math.random() * sound.incorrect.length)];
     var timesup = sound.timesUp[0];
     var end = sound.end[0];
 
-    // question objects are here
+    // question objects are below:
     var question0 = {
         theQuestion: ["What causes night and day?"],
         theAwnser: ["The earth spins on its axis."],
@@ -84,8 +95,11 @@ $(document).ready(function () {
 
     // timer in second
     var secondsLeft = 60;
+    // right choice counter
     var correctCounter = 0
+    // wronge choice counter
     var incorrectCounter = 0
+    // question number
     var questionCounter = 0
     var quizCounter = 0
     var testEnd = false
@@ -99,16 +113,9 @@ $(document).ready(function () {
     alertText.text(startingText[~~(Math.random() * startingText.length)]);
 
 
+    //****************************  EVENT LISTENERS START HERE   *****************
 
-
-
-
-
-    
-    //**********************************event listeners below*****************
-
-
-    // wait for start to be clicked
+    // Start BTN gets clicked
     $("#startButton").click(function (event) { 
         event.preventDefault();
         // play start sound
@@ -121,18 +128,17 @@ $(document).ready(function () {
         loadQuestion(questionCounter)
         // start the timer
         theTimer()
-
     });
 
-    // when a choice is selected
+    // When a choice is selected
     questionContainer.on("click", function (event) {
         event.preventDefault();
         var element = event.target;
 
         // prevent selecting multiple choices selection
+        // add up total choices made
         var totalAwnsers = incorrectCounter + correctCounter
-              console.log("selected: " + totalAwnsers +" question#: " + questionCounter)
-              console.log(questionCounter == totalAwnsers)
+
         if (totalAwnsers == questionCounter){
             if (element.matches("li") === true) {
                 // get the text of the button
@@ -148,16 +154,13 @@ $(document).ready(function () {
                     incorrectCounter++
                     console.log(incorrectCounter + " incorrect so far")
                     // shake the screen for 1 seconds
-                    // shakeScreen(2)
-                    showNextButton()
-                    
-                    // turn the button red
-                    
+                    shakeScreen(2)
                     $("li").removeClass("btn-outline-primary");
-                    $("li").addClass("btn-primary")
-                    // buttonSelected.removeClass("btn btn-outline-primary");
-                    // buttonSelected.addClass("btn btn-outline-danger");
-                    
+                    $("li").addClass("btn-outline-danger")
+                    // show the next button 
+                    showNextButton()
+
+
                 }else{
                     // when user picks the right choice
                     // play incorrect sound
@@ -165,23 +168,19 @@ $(document).ready(function () {
                     correctCounter++
                     console.log(correctCounter + " correct so far")
                     // shake the screen for .5 seconds
-                                    // turn the button green
-                    // buttonSelected.removeClass("btn btn-outline-success");
-                    // buttonSelected.addClass("btn btn-outline-danger");
                     shakeScreen(1)
-                    
+                    $("li").removeClass("btn-outline-primary");
+                    $("li").addClass("btn-outline-success")
+                    // show the next button
                     showNextButton()
-    
+
                 }
                 
-            
             }
             
         }else if (totalAwnsers !== questionCounter){
-            alertText.addClass("alert alert-warning");
             alertText.text("you already selected a choice for this question")
         }
-            
 
     
     });
@@ -234,16 +233,16 @@ $(document).ready(function () {
     }
 
     function showNextButton() {
-        // clear out existing next buttons
+        // clear out existing next buttons and any alerts
         nextDiv.empty()
+        alertText.empty()
 
         // display the next button to 
-
         // create the button
         var nextButton = $("<button></button>")
         // style the button
         nextButton.attr("class", "alert alert-dark");
-        if (questionCounter == 10) {
+        if (questionCounter == 9) {
             buttonText = "Get your score"
         }else{
             buttonText = "Next Question"
@@ -266,6 +265,7 @@ $(document).ready(function () {
             
             secondsLeft--;
             if(secondsLeft === 0) {
+                questionCounter = 9
             clearInterval(timerInterval);
             sendMessage();
             }else if (testEnd == true) {
@@ -309,33 +309,33 @@ $(document).ready(function () {
         bigText.text("")      
         // clear current question out
         questionContainer.empty()
+        alertText.empty()
         
         // create an new para for the results to go inside of
         result = $("h4")
-
             // determine result
             if (correctCounter <= 2) {
                 // style it
                 result.attr("class", "alert alert-danger")
-                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're are a complete imbecile and might be affected with moderate intellectual disability!")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You are a complete imbecile and might be affected with moderate intellectual disability!")
                 bigText.text("Imbecile")
 
             }else if (correctCounter <= 4){
                 // style it
                 result.attr("class", "alert alert-danger")
-                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're an idiot that most would consider a person of low intelligence!")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. Your an idiot that most would consider a person of low intelligence!")
                 bigText.text("Idiot")
             }
             else if (correctCounter <= 6){
                 // style it
                 result.attr("class", "alert alert-warning")
-                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're a moron, otherwise know as a stupid person.")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. Your a moron, otherwise know as a stupid person.")
                 bigText.text("Moron")
              }
             else if (correctCounter <= 8){
                 // style it
                 result.attr("class", "alert alert-secondary")
-                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. You're not too bright - Someone who is very stupid or just ignorant, and can't comprehend the most basic things.")
+                result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. Your not too bright - Someone who is very stupid or just ignorant, and can't comprehend the most basic things.")
                 bigText.text("Not Too Bright")
              }else if (correctCounter <= 10){
                 // style it
@@ -346,14 +346,9 @@ $(document).ready(function () {
                 
         // attach the result to the results container
         resultsContainer.append(result);
-
-
-
-        // play ending sound
+            //play the sound for the end  
         playSound(end)
-        // display results!
-              
+            
     }
-
 
 });
