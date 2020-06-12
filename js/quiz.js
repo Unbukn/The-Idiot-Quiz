@@ -337,12 +337,12 @@ $(document).ready(function () {
                 result.attr("class", "alert alert-secondary")
                 result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect. Your not too bright - Someone who is very stupid or just ignorant, and can't comprehend the most basic things.")
                 bigText.text("Not Too Bright")
-             }else if (correctCounter <= 10){
+            }else if (correctCounter <= 10){
                 // style it
                 result.attr("class", "alert alert-success")
                 result.text("You completed the test with " + correctCounter + " correct answers and " + incorrectCounter + " incorrect! But, it still looks like you're pretty dumb. Many things are challenging for you.")
                 bigText.text("Still Pretty Dumb")
-             }
+            }
                 
         // attach the result to the results container
         resultsContainer.append(result);
