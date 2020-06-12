@@ -2,7 +2,7 @@ body{
 background-color: rgba(16, 22, 63);
 font-family: 'IBM Plex Sans', sans-serif;
 color: rgb(199, 196, 196);
-overflow: hidden;
+overflow: auto;
 }
 #bigText{
     font-family: 'Pacifico', cursive;
